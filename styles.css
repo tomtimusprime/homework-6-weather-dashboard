@@ -1,0 +1,33 @@
+.jumbotron {
+    background-color: #0275d8;
+    color: white;
+}
+
+form {
+    padding: 5px;
+    margin: 5px;
+}
+
+.list-group-item {
+    color: #0275d8
+}
+.list-group-item:hover {
+    color: lightblue;
+}
+
+#results {
+    padding: 10px;
+    margin: 10px;
+}
+
+.severe {
+    color: red;
+}
+
+.moderate {
+    color: #ffdb58;
+}
+
+.favorable {
+    color: green;   
+}
