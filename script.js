@@ -1,6 +1,5 @@
 $(document).ready(function () {
     console.log("ready!");
-    //new
     repopulateCities();
 
     let APIKey = "f9593615380abd6eb91cc2a19a4938f5";
@@ -14,7 +13,6 @@ $(document).ready(function () {
 
     })
 
-    //new
     $("#saved-search").on("click", function (e) {
         let element = e.target;
         currentCity = element.textContent;
@@ -95,6 +93,7 @@ $(document).ready(function () {
         $results.empty();
         let divCity = $("#city");
         divCity.text(currentCity + " - " + moment().format("dddd, MMMM Do YYYY"));
+        divCity.attr("style", "font-weight: bold;");
         var weatherCard = weatherFactory(currentWeather);
         $results.append(weatherCard);
     }
