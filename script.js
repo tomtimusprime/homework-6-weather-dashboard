@@ -1,5 +1,6 @@
 $(document).ready(function () {
     console.log("ready!");
+    //new
     repopulateCities();
 
     let APIKey = "f9593615380abd6eb91cc2a19a4938f5";
@@ -7,51 +8,51 @@ $(document).ready(function () {
     $("#searchbtn").on("click", function (e) {
         e.preventDefault();
         currentCity = $("#search").val();
-        var history = localStorage.getItem("cityHistory");
-        if(!history) {
-            history = [];
-        }
-        else {
-            history = JSON.parse(history);
-            //
-        }
-        history.push(currentCity);
-        localStorage.setItem("cityHistory", JSON.stringify(history));
+        saveHistory(currentCity);
+        console.log("History: ", history);
         searchHandling();
 
     })
 
-    $(".list-group-item").on("click", function(e) {
+    //new
+    $("#saved-search").on("click", function (e) {
         let element = e.target;
         currentCity = element.textContent;
-        console.log(currentCity);
         searchHandling();
     })
 
-    function repopulateCities() {
-        let history = localStorage.getItem("cityHistory");
-        if(!history) {
+    function saveHistory(city) {
+        console.log("Save History", city);
+        var history = getHistory();
+        if(!history.includes(currentCity)) {
+            history.push(currentCity);
+        }
+        localStorage.setItem("cityHistory", JSON.stringify(history));
+        repopulateCities();
+    }
+
+    function getHistory() {
+        var history = localStorage.getItem("cityHistory");
+        if (!history) {
             history = [];
-            return;
         }
         else {
             history = JSON.parse(history);
-            for(let i = 0; i < history.length; i++) {
-                let newLi = $("<li>");
-                newLi.text(history[i]);
-                newLi.attr("class", "list-group-item");
-                $("#saved-search").append(newLi);
-            }
         }
-        
+        return history;
     }
 
-    //get city name from the class of that dom element
-    //update the value of the current city variable
-    //call search handling again on that button click.
-    //create another function to create the other cards
-    //on click add city name to your local storage 
-    //Get data from local storage and repopulate it on the page upon refresh
+    function repopulateCities() {
+        var history = getHistory();
+        $("#saved-search").empty();
+        for (let i = 0; i < history.length; i++) {
+            let newLi = $("<li>");
+            newLi.text(history[i]);
+            newLi.attr("class", "list-group-item");
+            $("#saved-search").append(newLi);
+        }
+
+    }
 
     function createLonAndLatQueryURL(currentCity) {
         return `https://api.openweathermap.org/data/2.5/forecast?q=${currentCity}&appid=${APIKey}&units=imperial`;
@@ -81,7 +82,8 @@ $(document).ready(function () {
             var data = {
                 temp: currentDay.temp.day,
                 humidity: currentDay.humidity,
-                icon: "http://openweathermap.org/img/wn/" + currentDay.weather[0].icon + "@2x.png"
+                icon: "http://openweathermap.org/img/wn/" + currentDay.weather[0].icon + "@2x.png",
+                date: currentDay.dt
             }
             array.push(data);
         }
@@ -97,13 +99,48 @@ $(document).ready(function () {
         $results.append(weatherCard);
     }
 
+    //new
+    function generateForecastCard(data) {
+        let div1 = $("<div>");
+        div1.attr("class", "col-4");
+        let card = $("<div>");
+        card.attr("class", "card");
+        card.attr("style", "width: 15rem; margin: 5px;");
+        div1.append(card);
+        let cardBody = $("<div>");
+        cardBody.attr("class", "card-body");
+        card.append(cardBody);
+        let heading = $("<h5>");
+        heading.attr("class", "card-title");
+        heading.text("Date: " + moment.unix(data.date).format("M/D/YYYY"));
+        let icon = $("<img>");
+        icon.attr("src", data.icon);
+        let temp = $("<div>").text("Temp: " + data.temp);
+        let humidity = $("<div>").text("Humidity: " + data.humidity);
+        cardBody.append(heading, icon, temp, humidity);
+
+        return div1;
+        
+    }
+
+    function forecastWeatherFactory(forecastWeather) {
+        return forecastWeather.map((weatherData)=> generateForecastCard(weatherData));
+    }
+
+    function updateForecastWeather(forecastWeather) {
+        var forecastElements = forecastWeatherFactory(forecastWeather);
+        console.log(forecastElements);
+        $("#forecast-weather").empty();
+        $("#forecast-weather").append(forecastElements);
+    }
+
     function weatherFactory(currentWeather) {
         let iconURL = "http://openweathermap.org/img/wn/" + currentWeather.weather[0].icon + "@2x.png";
         let iconEl = $("<img>").attr("src", iconURL);
         iconEl.attr("style", "height: 75px; width: 75px;");
         let div = $("<div>");
         //Update the main card with the necessary information for the current city
-        
+
         let tempEl = $("<h5>");
         tempEl.text("Temperature: " + currentWeather.temp);
         let humidityEl = $("<h5>");
@@ -136,7 +173,7 @@ $(document).ready(function () {
         let queryURL = createLonAndLatQueryURL(currentCity);
 
         //Populating all previous searches under the search input and button
-        populatePreviousSearches(currentCity);
+        // populatePreviousSearches(currentCity);
         fetchLatAndLong(queryURL)
             //Get's just the coordinates instead of all the unnecessary data - called object destructuring, adds a layer of security, you don't have to remember what order, etc.
             .then(function ({ city: { coord } }) {
@@ -147,16 +184,18 @@ $(document).ready(function () {
                         let forecastWeather = extractForecastData(res2.daily);
                         updateCurrentWeather(currentWeather);
                         updateForecastWeather(forecastWeather);
-                        //Adding the ICON
-                        let icon = (res2.current.weather["0"].icon);
-                        let iconURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
-                        $results.append(iconEl, tempEl, humidityEl, windSpeedEl, uvIndexEl);
-                        //localStorage.setItem("weather Results", );
                     });
 
             });
 
     }
+    //Has to be the same name that comes from the API object
+    // {city: {
+    //     coord: {
+    //         lon:
+    //         lat:
+    //     }
+    // }}
 
     function setUVColoring(currentUVI, uvIndexEl) {
         if (currentUVI > 7) {
