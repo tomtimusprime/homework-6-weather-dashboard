@@ -75,7 +75,7 @@ $(document).ready(function () {
     function extractForecastData(weatherArray) {
 
         let array = [];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 1; i < 6; i++) {
             var currentDay = weatherArray[i];
             var data = {
                 temp: currentDay.temp.day,
