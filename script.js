@@ -47,7 +47,7 @@ $(document).ready(function () {
             let newLi = $("<li>");
             newLi.text(history[i]);
             newLi.attr("class", "list-group-item");
-            $("#saved-search").append(newLi);
+            $("#saved-search").prepend(newLi);
         }
 
     }
@@ -114,7 +114,7 @@ $(document).ready(function () {
         heading.text("Date: " + moment.unix(data.date).format("M/D/YYYY"));
         let icon = $("<img>");
         icon.attr("src", data.icon);
-        let temp = $("<div>").text("Temp: " + data.temp);
+        let temp = $("<div>").text("Temp: " + Math.round(data.temp) + "°");
         let humidity = $("<div>").text("Humidity: " + data.humidity);
         cardBody.append(heading, icon, temp, humidity);
 
@@ -130,6 +130,7 @@ $(document).ready(function () {
         var forecastElements = forecastWeatherFactory(forecastWeather);
         console.log(forecastElements);
         $("#forecast-weather").empty();
+        $("#forecast-weather").append($("<strong>").text("5-Day Forecast:"));
         $("#forecast-weather").append(forecastElements);
     }
 
@@ -141,7 +142,7 @@ $(document).ready(function () {
         //Update the main card with the necessary information for the current city
 
         let tempEl = $("<h5>");
-        tempEl.text("Temperature: " + currentWeather.temp);
+        tempEl.text("Temperature: " + Math.round(currentWeather.temp) + "°");
         let humidityEl = $("<h5>");
         humidityEl.text("Humidity: " + currentWeather.humidity + "%")
         let windSpeedEl = $("<h5>");
@@ -158,13 +159,6 @@ $(document).ready(function () {
         return div;
     }
 
-    function populatePreviousSearches(currentCity) {
-        let newLi = $("<li>");
-        newLi.text(currentCity);
-        newLi.attr("class", "list-group-item");
-        $("#saved-search").prepend(newLi);
-    }
-
     function searchHandling() {
 
         //Setting up the first API Key
@@ -174,7 +168,8 @@ $(document).ready(function () {
         //Populating all previous searches under the search input and button
         // populatePreviousSearches(currentCity);
         fetchLatAndLong(queryURL)
-            //Get's just the coordinates instead of all the unnecessary data - called object destructuring, adds a layer of security, you don't have to remember what order, etc.
+            //Get's just the coordinates instead of all the unnecessary data - called object destructuring, 
+            //adds a layer of security, you don't have to remember what order, etc.
             .then(function ({ city: { coord } }) {
                 fetchWeatherData(coord)
                     .then(function (res2) {
@@ -188,13 +183,6 @@ $(document).ready(function () {
             });
 
     }
-    //Has to be the same name that comes from the API object
-    // {city: {
-    //     coord: {
-    //         lon:
-    //         lat:
-    //     }
-    // }}
 
     function setUVColoring(currentUVI, uvIndexEl) {
         if (currentUVI > 7) {
@@ -208,5 +196,12 @@ $(document).ready(function () {
         }
     }
 
-
+    //NOTE TO HOLD ONTO ABOUT OBJECT DESTRUCTURING
+    //Has to be the same name that comes from the API object
+    // {city: {
+    //     coord: {
+    //         lon:
+    //         lat:
+    //     }
+    // }}
 });
