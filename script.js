@@ -92,13 +92,14 @@ $(document).ready(function () {
         let $results = $("#results");
         $results.empty();
         let divCity = $("#city");
-        divCity.text(currentCity + " - " + moment().format("dddd, MMMM Do YYYY"));
-        divCity.attr("style", "font-weight: bold;");
+        let title = $("<h4>");
+        title.text(currentCity + " - " + moment().format("dddd, MMMM Do YYYY"));
+        divCity.empty();
+        divCity.append(title);
         var weatherCard = weatherFactory(currentWeather);
         $results.append(weatherCard);
     }
 
-    //new
     function generateForecastCard(data) {
         let div1 = $("<div>");
         div1.attr("class", "col-4");
@@ -115,7 +116,7 @@ $(document).ready(function () {
         let icon = $("<img>");
         icon.attr("src", data.icon);
         let temp = $("<div>").text("Temp: " + Math.round(data.temp) + "°");
-        let humidity = $("<div>").text("Humidity: " + data.humidity);
+        let humidity = $("<div>").text("Humidity: " + data.humidity + "%");
         cardBody.append(heading, icon, temp, humidity);
 
         return div1;
@@ -130,7 +131,7 @@ $(document).ready(function () {
         var forecastElements = forecastWeatherFactory(forecastWeather);
         console.log(forecastElements);
         $("#forecast-weather").empty();
-        $("#forecast-weather").append($("<strong>").text("5-Day Forecast:"));
+        // $("#forecast-weather").append($("<strong>").text("5-Day Forecast:"));
         $("#forecast-weather").append(forecastElements);
     }
 
