@@ -19,6 +19,7 @@ $(document).ready(function () {
         searchHandling();
     })
 
+    //Handles the localStorage and previous city search history
     function saveHistory(city) {
         console.log("Save History", city);
         var history = getHistory();
@@ -40,6 +41,7 @@ $(document).ready(function () {
         return history;
     }
 
+    //Handles the rendering of the previous city searches, including make sure the last city searched for is put at the top
     function repopulateCities() {
         var history = getHistory();
         $("#saved-search").empty();
@@ -52,6 +54,7 @@ $(document).ready(function () {
 
     }
 
+    //Functions to help with getting the right data - need to use 2 separate APIs because not all the data is included on one.
     function createLonAndLatQueryURL(currentCity) {
         return `https://api.openweathermap.org/data/2.5/forecast?q=${currentCity}&appid=${APIKey}&units=imperial`;
     }
@@ -88,6 +91,7 @@ $(document).ready(function () {
         return array;
     }
 
+    //The following functions help with rendering the current city weather
     function updateCurrentWeather(currentWeather) {
         let $results = $("#results");
         $results.empty();
@@ -131,7 +135,6 @@ $(document).ready(function () {
         var forecastElements = forecastWeatherFactory(forecastWeather);
         console.log(forecastElements);
         $("#forecast-weather").empty();
-        // $("#forecast-weather").append($("<strong>").text("5-Day Forecast:"));
         $("#forecast-weather").append(forecastElements);
     }
 
